@@ -1,5 +1,5 @@
 /*
- * @Author: shylocks https://github.com/shylocks
+ * @Author: dsl https://github.com/mit-ywtm/MyJD
  * @Date: 2021-01-1 15:12:23
  * @Last Modified by:   dsl
  * @Last Modified time: 2021-01-1 15:12:23
@@ -82,7 +82,7 @@ async function dpqd(){
 function getvenderId(token) {
   return new Promise(resolve => {
     const options = {
-      url: `https://api.m.jd.com/api?appid=interCenter_shopSign&t=${Date.now()}&loginType=2&functionId=interact_center_shopSign_getActivityInfo&body={%22token%22:%22${token}%22,%22venderId%22:%22%22}&jsonp=jsonp1000`,
+      url: `${JD_API_HOST}&t=${Date.now()}&loginType=2&functionId=interact_center_shopSign_getActivityInfo&body={%22token%22:%22${token}%22,%22venderId%22:%22%22}&jsonp=jsonp1000`,
       headers: {
         "accept": "*/*",
         "accept-encoding": "gzip, deflate, br",
