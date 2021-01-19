@@ -1,10 +1,3 @@
-/*
- * @Author: dsl https://github.com/mit-ywtm/MyJD
- * @Date: 2021-01-1 15:12:23
- * @Last Modified by:   dsl
- * @Last Modified time: 2021-01-1 15:12:23
- */
-/*
 const $ = new Env('店铺签到');
 const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
