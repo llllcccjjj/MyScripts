@@ -1,7 +1,7 @@
 const $ = new Env('积分加油站');
 
 //京喜签到需要token
-//token直接whyour 大佬的京喜农场的token即可，将whyour 大佬的token中的farm_jstoken换成ss_jstoken
+//token直接用whyour 大佬的京喜农场的token即可，将whyour 大佬的token中的farm_jstoken换成ss_jstoken
 //token填入示例：
 //{"ss_jstoken":"4782bbf5ab4cdb9a0b17d798ae021114","timestamp":"1610782844359","phoneid":"3524914bc77506b1-35666505646247"}
 const token=[
