@@ -4,6 +4,7 @@ import requests
 ipcode=''
 cookie=[]
 ipcode_regx='<input type="hidden" name="ipcode" id="ipcode" value="(.*?)" />'
+cookie_regx='<Cookie (.*?) for ha.189.cn/>'
 acct_regx='"(.*?)"'
 def getipcode():
     url = 'http://ha.189.cn/kd/'
@@ -18,8 +19,8 @@ def getipcode():
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
     }
     response = requests.get(url=url, headers=headers)
-    cookie.append(response.cookies["JSESSIONID"])
-    cookie.append(response.cookies["wt_fore_vs"])
+    cookie.append(re.findall(cookie_regx, str(response.cookies))[0])
+    cookie.append(re.findall(cookie_regx, str(response.cookies))[1])
     if response.status_code == 200:
         global ipcode
         ipcode=re.findall(ipcode_regx,response.text)[0]
@@ -41,7 +42,7 @@ def getAcct():
         "Origin": "http://ha.189.cn",
         "Referer": "http://ha.189.cn/kd/",
         "Accept-Encoding": "gzip, deflate",
-        "Cookie": "JSESSIONID=" + cookie[0] + "; wt_fore_vs=" + cookie[1],
+        "Cookie": cookie[0]+';'+cookie[1]
     }
     payloadData = {
         'callCount': 1,
@@ -64,7 +65,6 @@ def getAcct():
         response=requests.post(url=url, headers=headers,data=payloadData)
         if response.status_code == 200:
             acct = re.findall(acct_regx, response.text.encode('utf-8').decode('unicode_escape'))[3]
-            print(acct)
             return acct
         else:
             print(response.status_code)
@@ -87,7 +87,7 @@ def ts():
         "Origin": "http://ha.189.cn",
         "Referer": "http://ha.189.cn/kd/",
         "Accept-Encoding": "gzip, deflate",
-        "Cookie": "JSESSIONID=" + cookie[0] + "; wt_fore_vs=" + cookie[1],
+        "Cookie": cookie[0]+';'+cookie[1]
     }
     payloadData = {
         'callCount': 1,
