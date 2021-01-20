@@ -1,3 +1,23 @@
+/*
+店铺签到，各类店铺签到，有新的店铺直接添加token即可
+更新地址：https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js
+已支持IOS双京东账号, Node.js支持N个京东账号
+脚本兼容: QuantumultX, Surge, Loon, 小火箭，JSBox, Node.js
+============Quantumultx===============
+[task_local]
+#店铺签到
+20 7 * * * https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js, tag=店铺签到, enabled=true
+
+================Loon==============
+[Script]
+cron "20 7 * * *" script-path=https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js, tag=店铺签到
+
+===============Surge=================
+店铺签到 = type=cron,cronexp="10 7 * * *",wake-system=1,timeout=20,script-path=https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js
+
+============小火箭=========
+店铺签到 = type=cron,script-path=https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js, cronexpr="20 * * *", timeout=200, enable=true
+ */
 const $ = new Env('店铺签到');
 const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
@@ -14,6 +34,7 @@ const token=[
   'DF30084EB3E850B72B8446EF959DDC80',
   '5634899A50F1B03388CA8988DFC882B3',
   '3F3041AA03AA1403B6326C2923EB9385',
+  '1260C6BF7F53AAB348AC18D176BF612B',
 ]
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '';
@@ -75,7 +96,7 @@ async function dpqd(){
 function getvenderId(token) {
   return new Promise(resolve => {
     const options = {
-      url: `${JD_API_HOST}&t=${Date.now()}&loginType=2&functionId=interact_center_shopSign_getActivityInfo&body={%22token%22:%22${token}%22,%22venderId%22:%22%22}&jsonp=jsonp1000`,
+      url: `https://api.m.jd.com/api?appid=interCenter_shopSign&t=${Date.now()}&loginType=2&functionId=interact_center_shopSign_getActivityInfo&body={%22token%22:%22${token}%22,%22venderId%22:%22%22}&jsonp=jsonp1000`,
       headers: {
         "accept": "*/*",
         "accept-encoding": "gzip, deflate, br",
