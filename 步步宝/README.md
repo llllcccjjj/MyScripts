@@ -3,6 +3,7 @@
 抓包地址：https://bububao.duoshoutuan.com/user/profile
 
 抓取原格式：
+
 imei: 86205202442486
 ini: 22
 version: 18
