@@ -4,6 +4,7 @@ github:https://raw.githubusercontent.com/adwktt/adwktt/master/BBB.js
 打开App点击 我的 获取Cookie
 下載地址：http://bububao.yichengw.cn
 
+步步宝目前每天2元左右
 修改内容：支持多账号，支持主流推送（plus+,server酱等等）
 推送服务结合 sendNotify.js 使用
 更新时间：2020-1-22, 不熟悉QX等等设备获取多账号的过程，故仅支持 nodejs
