@@ -52,7 +52,7 @@ $.log(`\n=================共提供`+CookieVal.length+`个账号================
     .finally(() => $.done())
 
 
-function showmsg(){
+async function showmsg(){
     $.msg($.name, '', notice)
     if ($.isNode()) {
       await notify.sendNotify(notice)
