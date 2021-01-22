@@ -21,13 +21,13 @@ cron "20 7 * * *" script-path=https://raw.githubusercontent.com/mit-ywtm/MyJD/ma
 const $ = new Env('店铺签到');
 const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-
+const user_agent=require('./Useragent.js');
 const JD_API_HOST = 'https://api.m.jd.com/api?appid=interCenter_shopSign';
 let activityId=''
 let vender=''
+let num=0
 
 const token=[
-  '522A6F5EFF97FEC2A0A1241BE69B2611',
   '1676F536588C52D3AD145F80DC8C6FD2',
   'FEC0244D748F99A452C9E37B8944D2D3',
   'A6492C79085ADE8BFA760FC0B0CACB66',
@@ -87,7 +87,9 @@ if ($.isNode()) {
 
 async function dpqd(){
   for (var j = 0; j < token.length; j++) {
+    num=j+1
     await getvenderId(token[j])
+    if (vender=='') {continue}
     await getActivityInfo(token[j],vender)
     await signCollectGift(token[j],vender,activityId)
     await taskUrl(token[j],vender)
@@ -112,8 +114,14 @@ function getvenderId(token) {
           console.log(`\n${$.name}: API查询请求失败 ‼️‼️`)
           $.logErr(err);
         } else {
+          // console.log(data)
           data = JSON.parse(/{(.*)}/g.exec(data)[0])
-          vender=data.data.venderId
+          if (data.code==402) {
+            vender=''
+            console.log(`第`+num+`个店铺签到活动已失效`)
+          }else{
+            vender=data.data.venderId
+          }
         }
       } catch (e) {
         $.logErr(e, resp);
@@ -140,6 +148,7 @@ function getActivityInfo(token,venderId) {
     $.get(options, (err, resp, data) => {
       try {
         if (err) {
+          // console.log(data)
           console.log(`\n${$.name}: API查询请求失败 ‼️‼️`)
           $.logErr(err);
         } else {
@@ -174,6 +183,7 @@ function signCollectGift(token,venderId,activitytemp) {
           console.log(`\n${$.name}: API查询请求失败 ‼️‼️`)
           $.logErr(err);
         } else {
+          // console.log(data)
           data = JSON.parse(/{(.*)}/g.exec(data)[0])
         }
       } catch (e) {
@@ -206,7 +216,7 @@ function taskUrl(token,venderId) {
           $.logErr(err);
         } else {
             data = JSON.parse(/{(.*)}/g.exec(data)[0])
-            console.log(`已签到：`+data.data.days+`天`)
+            console.log(`第`+num+`个店铺已签到：`+data.data.days+`天`)
         }
       } catch (e) {
         $.logErr(e, resp);
