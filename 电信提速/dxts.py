@@ -6,6 +6,7 @@ cookie=[]
 ipcode_regx='<input type="hidden" name="ipcode" id="ipcode" value="(.*?)" />'
 cookie_regx='<Cookie (.*?) for ha.189.cn/>'
 acct_regx='"(.*?)"'
+result_regx='{(.*?)}'
 def getipcode():
     url = 'http://ha.189.cn/kd/'
     headers = {
@@ -109,8 +110,8 @@ def ts():
     try:
         response=requests.post(url=url, headers=headers,data=payloadData)
         if response.status_code == 200:
-            print(response.text.encode('utf-8').decode('unicode_escape'))
-            return response.text
+            result= re.findall(result_regx,response.text.encode('utf-8').decode('unicode_escape'))[0]
+            print(result)
         else:
             print(response.status_code)
             return response.status_code
