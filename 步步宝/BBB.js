@@ -1,6 +1,7 @@
 /*
 原作者：adwktt
 github:https://raw.githubusercontent.com/adwktt/adwktt/master/BBB.js
+打开App点击 我的 获取Cookie
 下載地址：http://bububao.yichengw.cn
 
 修改内容：支持多账号，支持主流推送（plus+,server酱等等）
@@ -8,13 +9,15 @@ github:https://raw.githubusercontent.com/adwktt/adwktt/master/BBB.js
 更新时间：2020-1-22, 不熟悉QX等等设备获取多账号的过程，故仅支持 nodejs
 */
 
+
+
 const $ = new Env('步步宝')
 const notify = $.isNode() ? require('../sendNotify') : '';
 let notice =''
 var i=0,num=0;
 let CookieVal =[
-  `{"imei": "346aeb3d01b03a64","ini": "29","version": "18","tokenstr": "46F590DE0B4D2337EB632B57B526728G1611153846","store": "0","platform": "1","Content-Type": "application/x-www-form-urlencoded","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; MI 8 MIUI/20.9.4)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Length": "0"}`,  //账号一
-  `{"imei": "7590520379297666","ini": "22","version": "18","tokenstr": "64E7E8917A6E043BAEF9B4C62527857G16113146","store": "0","platform": "1","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 5.1; HUAWEI TAG-AL00 Build/HUAWEITAG-AL00)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Type": "application/x-www-form-urlencoded","Cookie": "PHPSESSID=6r6mp57rsfsff2v2tbdeahsj8c0","Content-Length": "0"}`, //账号二
+  `{"imei": "274aeb3d01b03a65","ini": "29","version": "18","tokenstr": "45F590DE0B4D2337EB632B57B526728G5269153849","store": "0","platform": "1","Content-Type": "application/x-www-form-urlencoded","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; MI 8 MIUI/20.9.4)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Length": "0"}`,
+  `{"imei": "862052037929126","ini": "22","version": "18","tokenstr": "50E7E8917A6E043BAEF9B4C62527857G1526318461","store": "0","platform": "1","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 5.1; HUAWEI TAG-AL00 Build/HUAWEITAG-AL00)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Type": "application/x-www-form-urlencoded","Cookie": "PHPSESSID=121257r28eb2v2tbdeahsj8c0","Content-Length": "0"}`,
 ]
 
 if ($.isNode()) {
@@ -663,6 +666,9 @@ function checkHomeJin() {
         $.log('\n🔔等待'+(checkhomejb.right_time+5)+'s领取首页金币')
         await $.wait(checkhomejb.right_time*1000+5000)
         await homeJin()
+      }else if (checkhomejb.right_st == 2 && checkhomejb.steps_btn_st == 1) {
+        $.log('\n🔔开始查询步数状态\n')
+        await doneJin()
       }else if(checkhomejb.right_st == 0 && checkhomejb.right_time <= 0){
         $.log('\n🔔开始查询首页金币状态\n')
         await homeJin()
@@ -725,26 +731,26 @@ $.log('\n🔔开始领取首页金币\n')
 
 // 翻倍首页金币
 function homeJinCallBack() {
-return new Promise((resolve, reject) => {
-  let timestamp=new Date().getTime();
-  let homejincallback ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
-    headers: JSON.parse(CookieVal[i]),
-    body: `nonce_str=${homeJinStr}&tid=21&pos=1&`,
-}
-   $.post(homejincallback,async(error, response, data) =>{
-     const hmjcallback = JSON.parse(data)
-$.log('\n🔔开始翻倍首页金币\n')
+  return new Promise((resolve, reject) => {
+    let timestamp=new Date().getTime();
+    let homejincallback ={
+      url: `https://bububao.duoshoutuan.com/you/callback`,
+      headers: JSON.parse(CookieVal[i]),
+      body: `nonce_str=${homeJinStr}&tid=21&pos=1&`,
+    }
+    $.post(homejincallback,async(error, response, data) =>{
+      const hmjcallback = JSON.parse(data)
+      $.log('\n🔔开始翻倍首页金币\n')
       if(hmjcallback.code == 1) {
-          $.log('\n🎉首页金币翻倍成功\n')
-          await checkHomeJin()
-           }else{
-          $.log('\n🔔首页金币翻倍失败'+hmjcallback.msg+'\n')
-           }
-          resolve()
+        $.log('\n🎉首页金币翻倍成功\n')
+        await checkHomeJin()
+      }else{
+        $.log('\n🔔首页金币翻倍失败'+hmjcallback.msg+'\n')
+      }
+      resolve()
     })
-   })
-  } 
+  })
+} 
 
 // 查询首页紅包ID
 function checkRedBagId() {
@@ -868,116 +874,121 @@ $.log('\n🔔开始翻倍首页金蛋\n')
   } 
 // 查询助力视频状态
 function helpStatus() {
-return new Promise((resolve, reject) => {
-  let timestamp=new Date().getTime();
-  let helpstatus ={
-    url: `https://bububao.duoshoutuan.com/user/help_index`,
-    headers: JSON.parse(CookieVal[i]),
-}
-   $.post(helpstatus,async(error, response, data) =>{
-     const help = JSON.parse(data)
-$.log('\n🔔开始查询助力视频状态\n')
+  return new Promise((resolve, reject) => {
+    let timestamp=new Date().getTime();
+    let helpstatus ={
+      url: `https://bububao.duoshoutuan.com/user/help_index`,
+      headers: JSON.parse(CookieVal[i]),
+    }
+    $.post(helpstatus,async(error, response, data) =>{
+      const help = JSON.parse(data)
+      $.log('\n🔔开始查询助力视频状态\n')
       if(help.status == 0) {
-$.log('\n🔔查询助力视频状态成功, 1s后獲取助力视频ID\n')
-          await checkCode()
-           }else{
-$.log('\n🔔今日助力已上限,请明天再試!\n')
-           }
-          resolve()
+        $.log('\n🔔查询助力视频状态成功, 1s后获取助力视频ID\n')
+        await checkCode()
+      }else{
+        $.log('\n🔔今日助力已上限,请明天再試!\n')
+      }
+      resolve()
     })
-   })
-  } 
+  })
+} 
 
 // 查询助力视频ID
 function checkCode() {
-return new Promise((resolve, reject) => {
-  let timestamp=new Date().getTime();
-  let checkcode ={
-    url: `https://bububao.duoshoutuan.com/user/chuansj`,
-    headers: JSON.parse(CookieVal[i]),
-    body: `mini_pos=5&c_type=1&`,
-}
-   $.post(checkcode,async(error, response, data) =>{
-     const code = JSON.parse(data)
-$.log('\n🔔开始查询助力视频ID\n')
+  return new Promise((resolve, reject) => {
+    let timestamp=new Date().getTime();
+    let checkcode ={
+      url: `https://bububao.duoshoutuan.com/user/chuansj`,
+      headers: JSON.parse(CookieVal[i]),
+      body: `mini_pos=5`,
+    }
+    $.post(checkcode,async(error, response, data) =>{
+      const code = JSON.parse(data)
+      $.log('\n🔔开始查询助力视频ID\n')
       if(code.code == 1) {
-      nonce_str = code.nonce_str
-$.log('\n🔔查询助力视频ID成功, 开始观看助力视频\n')
-          await helpClick()
-           }
-          resolve()
+        nonce_str = code.nonce_str
+        $.log('\n🔔查询助力视频ID成功, 开始观看助力视频\n')
+        await helpClick()
+      }
+      resolve()
     })
-   })
-  } 
+  })
+} 
 
 // 观看助力视频
 function helpClick() {
-return new Promise((resolve, reject) => {
-  let timestamp=new Date().getTime();
-  let helpclick ={
-    url: `https://bububao.duoshoutuan.com/user/help_click`,
-    headers: JSON.parse(CookieVal[i]),
-    body: `nonce_str=${nonce_str}`,
-}
-   $.post(helpclick,async(error, response, data) =>{
-     const help = JSON.parse(data)
+  return new Promise((resolve, reject) => {
+    let timestamp=new Date().getTime();
+    let helpclick ={
+      url: `https://bububao.duoshoutuan.com/user/help_click`,
+      headers: JSON.parse(CookieVal[i]),
+      body: `nonce_str=${nonce_str}`,
+    }
+    $.post(helpclick,async(error, response, data) =>{
+      const help = JSON.parse(data)
       if(help.code == 1) {
-$.log('\n🔔开始观看助力视频, 60s后领取助力视频奖励\n')
-          await $.wait(60000)
-          $.log('\n🎉观看助力视频成功, 1s后领取金币+ '+help.jinbi+'\n')
-          await callBack()
-           }else{
-          $.log('\n⚠️观看助力视频失败: '+help.msg+'\n')
-           }
-          resolve()
+        $.log('\n🔔开始观看助力视频, 32s后领取助力视频奖励\n')
+        await $.wait(32000)
+        $.log('\n🎉观看助力视频成功, 1s后领取金币+ '+help.jinbi+'\n')
+        await callBack()
+      }else{
+        $.log('\n⚠️观看助力视频失败: '+help.msg+'\n')
+      }
+      resolve()
     })
-   })
-  } 
+  })
+} 
 
 
 // 领取助力视频奖励
 function callBack() {
-return new Promise((resolve, reject) => {
-  let timestamp=new Date().getTime();
-  let callback ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
-    headers: JSON.parse(CookieVal[i]),
-    body: `nonce_str=${nonce_str}&tid=22&pos=1&`,
-}
-   $.post(callback,async(error, response, data) =>{
-     const back = JSON.parse(data)
-$.log('\n🔔开始领取助力视频奖励\n')
+  return new Promise((resolve, reject) => {
+    let timestamp=new Date().getTime();
+    let callback ={
+      url: `https://bububao.duoshoutuan.com/you/callback`,
+      headers: JSON.parse(CookieVal[i]),
+      body: `nonce_str=${nonce_str}&tid=22&pos=1&`,
+    }
+    $.post(callback,async(error, response, data) =>{
+      const back = JSON.parse(data)
+      $.log('\n🔔开始领取助力视频奖励\n')
       if(back.code == 1) {
-          $.log('\n🎉领取助力视频奖励成功,1s后查询下一次助力视频状态\n')
-          await $.wait(1000)
-          await helpStatus()
-           }else{
-          $.log('\n⚠️助力视频奖励失败:'+back.msg+'\n')
-           }
-          resolve()
+        $.log('\n🎉领取助力视频奖励成功,1s后查询下一次助力视频状态\n')
+        await $.wait(1000)
+        await helpStatus()
+      }else{
+        $.log('\n⚠️助力视频奖励失败:'+back.msg+'\n')
+      }
+      resolve()
     })
-   })
-  } 
+  })
+} 
 
 // 查询新闻ID
 function getNewsId() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let getnewsid ={
-    url: 'https://bububao.duoshoutuan.com/user/news',
+    url: `https://bububao.duoshoutuan.com/user/news`,
     headers: JSON.parse(CookieVal[i]),
-    body: `type_class=1&`
+    body: `type_class=1`
 }
    $.post(getnewsid,async(error, response, data) =>{
      const newsid = JSON.parse(data)
      if(newsid.code == 1){
-       if(newsid.is_first == 1 && newsid.is_max == 0){
+       if(newsid.is_first == -1 && newsid.is_max == 0){
           $.log('\n🔔开始查询新闻ID\n')
           newsStr = newsid.nonce_str
-          $.log('\n🎉新闻ID查询成功,15s后领取阅读奖励\n')
-          await $.wait(15000)
-          await autoRead()
-          }else{
+          $.log('\n🎉新闻ID查询成功,每15s领取阅读奖励\n')
+          for (var m = 0; m < 3; m++) {
+            $.log(`\n🎉同一篇新闻第`+(m+1)+`次阅读\n`)
+            await $.wait(15000)
+            await autoRead()
+          }
+          $.log('\n3次阅读完成，开始查询下一篇新闻ID\n')
+          await getNewsId()
+        }else{
           $.log('\n⚠️阅读失败: 今日阅读已上限\n')
           await checkLuckNum()
          }}else{
@@ -987,27 +998,26 @@ return new Promise((resolve, reject) => {
     })
    })
   } 
-// 查询下一篇新闻ID
+// 阅读
 function autoRead() {
-return new Promise((resolve, reject) => {
-  let timestamp=new Date().getTime();
-  let autoread ={
-    url: 'https://bububao.duoshoutuan.com/user/donenews',
-    headers: JSON.parse(CookieVal[i]),
-    body: `nonce_str=${newsStr}& `,
-}
-   $.post(autoread,async(error, response, data) =>{
-     const read = JSON.parse(data)
+  return new Promise((resolve, reject) => {
+    let timestamp=new Date().getTime();
+    let autoread ={
+      url: `https://bububao.duoshoutuan.com/user/donenews`,
+      headers: JSON.parse(CookieVal[i]),
+      body: `nonce_str=${newsStr}`,
+    }
+    $.post(autoread,async(error, response, data) =>{
+      const read = JSON.parse(data)
       if(read.code == 1) {
-          $.log('\n🎉阅读成功,金币+ '+read.jinbi+'💰,开始查询下一篇新闻ID\n')
-            await getNewsId()
-          }else{
-          $.log('\n⚠️阅读失败:'+data+'\n')
-           }
-          resolve()
+        $.log('\n🎉阅读成功,金币+ '+read.jinbi+'💰\n')
+      }else{
+        $.log('\n⚠️阅读失败:'+data+'\n')
+      }
+      resolve()
     })
-   })
-  } 
+  })
+} 
 // 查询抽奖次数
 function checkLuckNum() {
 return new Promise((resolve, reject) => {
@@ -1261,7 +1271,53 @@ $.log('\n🔔开始翻倍答題金币\n')
    })
   } 
 
+// 领取首页金币
+function doneJin() {
+  return new Promise((resolve, reject) => {
+    let timestamp=new Date().getTime();
+    let donejin ={
+      url: 'https://bububao.duoshoutuan.com/user/donejin',
+      headers: JSON.parse(CookieVal[i]),
+    }
+    $.post(donejin,async(error, response, data) =>{
+      const donejb = JSON.parse(data)
+      if(donejb.code == 1){
+        $.log('\n🔔开始领取步数金币\n')
+        $.log('\n🎉步数金币:'+donejb.msg+'\n金币+ '+donejb.jinbi+'等待30s后开始翻倍金币\n')
+        doneJinStr = donejb.nonce_str
+        await $.wait(30000)
+        await doneJinCallBack()
+      }else{
+        $.log('\n⚠️步数金币失败:'+donejb.msg+'\n')
+      }
+      resolve()
+    })
+  })
+} 
 
+
+// 翻倍步数金币
+function doneJinCallBack() {
+  return new Promise((resolve, reject) => {
+    let timestamp=new Date().getTime();
+    let donejincallback ={
+      url: `https://bububao.duoshoutuan.com/you/callback`,
+      headers: JSON.parse(CookieVal[i]),
+      body: `nonce_str=${doneJinStr}&tid=19&pos=1&`,
+    }
+    $.post(donejincallback,async(error, response, data) =>{
+      const bsjcallback = JSON.parse(data)
+      $.log('\n🔔开始翻倍步数金币\n')
+      if(bsjcallback.code == 1) {
+        $.log('\n🎉步数金币翻倍成功\n')
+        await checkHomeJin()
+      }else{
+        $.log('\n🔔步数金币翻倍失败'+bsjcallback.msg+'\n')
+      }
+      resolve()
+    })
+  })
+}
 
 function checkH5Id() {
 return new Promise((resolve, reject) => {
