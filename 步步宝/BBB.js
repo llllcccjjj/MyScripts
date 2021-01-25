@@ -4,6 +4,7 @@ github:https://raw.githubusercontent.com/adwktt/adwktt/master/BBB.js
 打开App点击 我的 获取Cookie
 下載地址：http://bububao.yichengw.cn
 
+自用
 修改内容：支持多账号，支持主流推送（plus+,server酱等等）
 推送服务结合 sendNotify.js 使用
 更新时间：2020-1-22, 不熟悉QX等等设备获取多账号的过程，故仅支持 nodejs
@@ -16,8 +17,8 @@ const notify = $.isNode() ? require('../sendNotify') : '';
 let notice =''
 var i=0,num=0;
 let CookieVal =[
-  `{"imei": "274aeb3d01b03a65","ini": "29","version": "18","tokenstr": "45F590DE0B4D2337EB632B57B526728G5269153849","store": "0","platform": "1","Content-Type": "application/x-www-form-urlencoded","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; MI 8 MIUI/20.9.4)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Length": "0"}`,
-  `{"imei": "862052037929126","ini": "22","version": "18","tokenstr": "50E7E8917A6E043BAEF9B4C62527857G1526318461","store": "0","platform": "1","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 5.1; HUAWEI TAG-AL00 Build/HUAWEITAG-AL00)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Type": "application/x-www-form-urlencoded","Cookie": "PHPSESSID=121257r28eb2v2tbdeahsj8c0","Content-Length": "0"}`,
+  `{"imei": "456aeb3d01b03a45","ini": "29","version": "18","tokenstr": "34F590DE0B4D2337EB632B57B526728G1611154523","store": "0","platform": "1","Content-Type": "application/x-www-form-urlencoded","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; MI 8 MIUI/20.9.4)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Length": "0"}`,
+  `{"imei": "452052037929286","ini": "22","version": "18","tokenstr": "50E7E8917A6E043BAEF9B4C62527857G1611345621","store": "0","platform": "1","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 5.1; HUAWEI TAG-AL00 Build/HUAWEITAG-AL00)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Type": "application/x-www-form-urlencoded","Cookie": "PHPSESSID=6r6mp75r24eb2v2tbdeahsj8c0","Content-Length": "0"}`,
 ]
 
 if ($.isNode()) {
@@ -52,10 +53,10 @@ $.log(`\n=================共提供`+CookieVal.length+`个账号================
     .finally(() => $.done())
 
 
-function showmsg(){
+async function showmsg(){
     $.msg($.name, '', notice)
     if ($.isNode()) {
-      notify.sendNotify(notice)
+      await notify.sendNotify(`步步宝`,notice)
     }
 }
 
@@ -672,6 +673,9 @@ function checkHomeJin() {
       }else if(checkhomejb.right_st == 0 && checkhomejb.right_time <= 0){
         $.log('\n🔔开始查询首页金币状态\n')
         await homeJin()
+      }else if(checkhomejb.right_st == 0 && checkhomejb.right_jinbi_st == 0){
+        $.log('\n🔔开始查询首页金币状态\n')
+        await homeJin()
       }else if(checkhomejb.right_st == 2 && checkhomejb.jindan_show != 2){
         $.log('\n🔔开始查询首页金蛋状态\n')
         $.log('\n🔔等待'+(checkhomejb.jindan_djs+5)+'s领取金蛋奖励')
@@ -696,7 +700,7 @@ function checkHomeJin() {
       }else if(checkhomejb.right_st == 2 && checkhomejb.jindan_show == 2 && checkhomejb.hb_time < 0){
         await checkRedBagId()
       }else if(checkhomejb.right_st == 2 && checkhomejb.jindan_show == 2 && checkhomejb.hb_st == 2){
-        $.log('\n🔔首页金币状态:'+checkhomejb.right_text+'\n🔔首页紅包状态:'+checkhomejb.hb_text+'\n🔔首页金蛋状态:'+checkhomejb.jindan_text+'\n')
+        $.log('\n🔔首页金币状态:'+checkhomejb.right_text+'\n🔔首页紅包状态:'+checkhomejb.hb_text+'\n🔔首页金蛋状态:'+checkhomejb.jindan_text+'\n'+'\n🔔首页步数状态:'+checkhomejb.steps_btn+'\n')
       }
       resolve()
     })
