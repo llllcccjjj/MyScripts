@@ -5,14 +5,14 @@ github:https://raw.githubusercontent.com/adwktt/adwktt/master/BBB.js
 下載地址：http://bububao.yichengw.cn
 
 修改内容：支持多账号，支持主流推送（plus+,server酱等等）
-推送服务结合 sendNotify.js 使用
+推送服务结合 sendNotify.js 使用,将sendNotify.js放在 BBB.js同级目录即可
 更新时间：2020-1-22, 不熟悉QX等等设备获取多账号的过程，故仅支持 nodejs
 */
 
 
 
 const $ = new Env('步步宝')
-const notify = $.isNode() ? require('../sendNotify') : '';
+const notify = $.isNode() ? require('./sendNotify') : '';
 let notice =''
 var i=0,num=0;
 let CookieVal =[
