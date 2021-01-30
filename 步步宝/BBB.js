@@ -14,7 +14,7 @@ github:https://raw.githubusercontent.com/adwktt/adwktt/master/BBB.js
 
 
 const $ = new Env('步步宝')
-const notify = $.isNode() ? require('../sendNotify') : '';
+const notify = $.isNode() ? require('./sendNotify') : '';
 const BBB_API = `https://bububao.duoshoutuan.com/` 
 let notice =''
 const now_time=new Date().getHours()
