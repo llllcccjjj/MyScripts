@@ -4,20 +4,24 @@ github:https://raw.githubusercontent.com/adwktt/adwktt/master/BBB.js
 打开App点击 我的 获取Cookie
 下載地址：http://bububao.yichengw.cn
 
-修改内容：支持多账号，支持主流推送（plus+,server酱等等）
+脚本自用
+修改内容： 支持多账号，支持主流推送（plus+,server酱等等）,修复不能看新闻bug
+          增加首页看看賺，增加自动领步数金币
 推送服务结合 sendNotify.js 使用,将sendNotify.js放在 BBB.js同级目录即可
-更新时间：2020-1-22, 不熟悉QX等等设备获取多账号的过程，故仅支持 nodejs
+更新时间：2020-1-29, 不熟悉QX等等设备获取多账号的过程，故仅支持 nodejs
 */
 
 
 
 const $ = new Env('步步宝')
-const notify = $.isNode() ? require('./sendNotify') : '';
+const notify = $.isNode() ? require('../sendNotify') : '';
+const BBB_API = `https://bububao.duoshoutuan.com/` 
 let notice =''
+const now_time=new Date().getHours()
 var i=0,num=0;
 let CookieVal =[
-  `{"imei": "221aeb3d01b0d33","ini": "29","version": "18","tokenstr": "6sF590DE0B4D2337EB632B57B526728G1622243849","store": "0","platform": "1","Content-Type": "application/x-www-form-urlencoded","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; MI 8 MIUI/20.9.4)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Length": "0"}`,
-  `{"imei": "232052037929223","ini": "22","version": "18","tokenstr": "14E7E8917A6E043BAEF9B4C62527857G1622438461","store": "0","platform": "1","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 5.1; HUAWEI TAG-AL00 Build/HUAWEITAG-AL00)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Type": "application/x-www-form-urlencoded","Cookie": "PHPSESSID=6r6mp57r45rg2v2tbdeafrj8c0","Content-Length": "0"}`,
+  `{"imei": "274aeb3d01b03a23","ini": "29","version": "18","tokenstr": "62F590DE0B4D2337EB632B57B526728G1634343849","store": "0","platform": "1","Content-Type": "application/x-www-form-urlencoded","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; MI 8 MIUI/20.9.4)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Cookie": "PHPSESSID=p2ejpje2sism9g6jlldmtj5436","Content-Length": "0"}`,
+  `{"imei": "862052037929145","ini": "22","version": "18","tokenstr": "50E7E8917A6E043BAEF9B4C62527857G1634348461","store": "0","platform": "1","User-Agent": "Dalvik/2.1.0 (Linux; U; Android 5.1; HUAWEI TAG-AL00 Build/HUAWEITAG-AL00)","Host": "bububao.duoshoutuan.com","Connection": "Keep-Alive","Accept-Encoding": "gzip","Content-Type": "application/x-www-form-urlencoded","Cookie": "PHPSESSID=6r6mp57r75eb2v2tbdeahsj8c0","Content-Length": "0"}`,
 ]
 
 if ($.isNode()) {
@@ -43,9 +47,11 @@ $.log(`\n=================共提供`+CookieVal.length+`个账号================
     await helpStatus()      // 查询助力视频状态
     await getNewsId()       // 查询新闻ID
     await getQuestionId()   // 查询答題ID
-    await checkH5Id()       // 看看賺
     await guaList()         // 查询刮刮卡ID
     await checkHomeJin()    // 查询首页状态
+    if (now_time==10) {
+      await checkH5Id()        // 看看賺,一天一次
+    }     
     await showmsg()         // 推送消息
   }
 })()
@@ -72,7 +78,7 @@ function userInfo() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let userInfo ={
-    url: 'https://bububao.duoshoutuan.com/user/profile',
+    url: `${BBB_API}user/profile`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(userInfo,async(error, response, data) =>{
@@ -92,7 +98,7 @@ function signIn() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let signin ={
-    url: `https://bububao.duoshoutuan.com/user/sign`,
+    url: `${BBB_API}user/sign`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(signin,async(error, response, data) =>{
@@ -115,7 +121,7 @@ function signDouble() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let signdouble ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
+    url: `${BBB_API}you/callback`,
     headers: JSON.parse(CookieVal[i]),
     body: `nonce_str=${signInStr}&tid=2&pos=1&`,
 }
@@ -137,7 +143,7 @@ function zaoWanDkInfo() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let zaowandkinfo ={
-    url: `https://bububao.duoshoutuan.com/mini/dk_info`,
+    url: `${BBB_API}mini/dk_info`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(zaowandkinfo,async(error, response, data) =>{
@@ -159,7 +165,7 @@ function zaoWanDk() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let zaowandk ={
-    url: `https://bububao.duoshoutuan.com/user/chuansj`,
+    url: `${BBB_API}user/chuansj`,
     headers: JSON.parse(CookieVal[i]),
     body: `mini_pos=3&c_type=1&`,
 }
@@ -179,7 +185,7 @@ function dkClick() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let dkclick ={
-    url: `https://bububao.duoshoutuan.com/mini/dk_click`,
+    url: `${BBB_API}mini/dk_click`,
     headers: JSON.parse(CookieVal[i]),
     body: `now_time=${nowTime}&`,
 }
@@ -201,7 +207,7 @@ function guaList() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let gualist ={
-    url: `https://bububao.duoshoutuan.com/gua/gualist?`,
+    url: `${BBB_API}gua/gualist?`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(gualist,async(error, response, data) =>{
@@ -227,7 +233,7 @@ function guaDet() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let guadet ={
-    url: `https://bububao.duoshoutuan.com/gua/guadet?`,
+    url: `${BBB_API}gua/guadet?`,
     headers: JSON.parse(CookieVal[i]),
     body: `gid=${guaID}&`
 }
@@ -251,7 +257,7 @@ function guaPost() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let guapost ={
-    url: `https://bububao.duoshoutuan.com/gua/guapost?`,
+    url: `${BBB_API}gua/guapost?`,
     headers: JSON.parse(CookieVal[i]),
     body: `sign=${SIGN}&gid=${guaID}&glid=${GLID}&`
 }
@@ -274,7 +280,7 @@ function guaDouble() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let guadouble ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
+    url: `${BBB_API}you/callback`,
     headers: JSON.parse(CookieVal[i]),
     body: `nonce_str=${guaStr}&tid=6&pos=1&`,
 }
@@ -298,7 +304,7 @@ function checkWaterNum() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let checkwaternum ={
-    url: `https://bububao.duoshoutuan.com/mini/water_info`,
+    url: `${BBB_API}mini/water_info`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(checkwaternum,async(error, response, data) =>{
@@ -326,7 +332,7 @@ function checkWaterSp() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let checksp ={
-    url: `https://bububao.duoshoutuan.com/user/chuansj`,
+    url: `${BBB_API}user/chuansj`,
     headers: JSON.parse(CookieVal[i]),
     body: `mini_pos=2&c_type=1&`,
 }
@@ -345,7 +351,7 @@ function WaterSp() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let watersp ={
-    url: `https://bububao.duoshoutuan.com/mini/water_sp`,
+    url: `${BBB_API}mini/water_sp`,
     headers: JSON.parse(CookieVal[i]),
     body: `day_num=${waterNum}&`,
 }
@@ -365,7 +371,7 @@ function waterClick() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let waterclick ={
-    url: `https://bububao.duoshoutuan.com/mini/water_click`,
+    url: `${BBB_API}mini/water_click`,
     headers: JSON.parse(CookieVal[i]),
     body: `day_num=0${waterNum}&`,
 }
@@ -387,7 +393,7 @@ function sleepStatus() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let sleepstatus ={
-    url: `https://bububao.duoshoutuan.com/mini/sleep_info`,
+    url: `${BBB_API}mini/sleep_info`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(sleepstatus,async(error, response, data) =>{
@@ -425,7 +431,7 @@ function sleepStart() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let sleepstart ={
-    url: `https://bububao.duoshoutuan.com/mini/sleep_start`,
+    url: `${BBB_API}mini/sleep_start`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(sleepstart,async(error, response, data) =>{
@@ -445,7 +451,7 @@ function sleepEnd() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let sleepend ={
-    url: `https://bububao.duoshoutuan.com/mini/sleep_end`,
+    url: `${BBB_API}mini/sleep_end`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(sleepend,async(error, response, data) =>{
@@ -466,7 +472,7 @@ function sleepDone() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let sleepdone ={
-    url: `https://bububao.duoshoutuan.com/mini/sleep_done`,
+    url: `${BBB_API}mini/sleep_done`,
     headers: JSON.parse(CookieVal[i]),
     body: `taskid=${sleepId}&nonce_str=${sleepStr}&`
 }
@@ -487,7 +493,7 @@ function clickTaskStatus() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let clicktaskstatus ={
-    url: `https://bububao.duoshoutuan.com/user/renwu`,
+    url: `${BBB_API}user/renwu`,
     headers: JSON.parse(CookieVal[i]),
     body: `idfa=${JSON.parse(CookieVal[i])['idfa']}&`,
 }
@@ -508,7 +514,7 @@ function watchTaskStatus() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let watchtaskstatus ={
-    url: `https://bububao.duoshoutuan.com/user/renwu`,
+    url: `${BBB_API}user/renwu`,
     headers: JSON.parse(CookieVal[i]),
     body: `idfa=${JSON.parse(CookieVal[i])['idfa']}&`,
 }
@@ -532,7 +538,7 @@ function checkDailyWatchAdId() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let checkdailywatchadid ={
-    url: `https://bububao.duoshoutuan.com/user/chuansj`,
+    url: `${BBB_API}user/chuansj`,
     headers: JSON.parse(CookieVal[i]),
     body: `mini_pos=0&c_type=1&`,
 }
@@ -556,7 +562,7 @@ function DailyWatchAd() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let dailywatchad ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
+    url: `${BBB_API}you/callback`,
     headers: JSON.parse(CookieVal[i]),
     body: `nonce_str=${dailyWatchStr}&tid=9&pos=1&`,
 }
@@ -586,7 +592,7 @@ function checkDailyClickAdId() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let checkdailyclickadid ={
-    url: `https://bububao.duoshoutuan.com/user/admobile_show`,
+    url: `${BBB_API}user/admobile_show`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(checkdailyclickadid,async(error, response, data) =>{
@@ -609,7 +615,7 @@ function checkDailyClickAd() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let checkdailyclickad ={
-    url: `https://bububao.duoshoutuan.com/user/admobile_click`,
+    url: `${BBB_API}user/admobile_click`,
     headers: JSON.parse(CookieVal[i]),
     body: `ad_id=${dailyClickAdId}&`,
 }
@@ -632,7 +638,7 @@ function DailyClickAd() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let dailyclickad ={
-    url: `https://bububao.duoshoutuan.com/user/admobile_done`,
+    url: `${BBB_API}user/admobile_done`,
     headers: JSON.parse(CookieVal[i]),
     body: `nonce_str=${dailyClickStr}&ad_id=${dailyClickAdId}&`,
 }
@@ -657,7 +663,7 @@ function checkHomeJin() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let checkhomejin ={
-      url: 'https://bububao.duoshoutuan.com/user/home',
+      url: `${BBB_API}user/home`,
       headers: JSON.parse(CookieVal[i]),
     }
     $.post(checkhomejin,async(error, response, data) =>{
@@ -715,7 +721,7 @@ function homeJin() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let homejin ={
-    url: 'https://bububao.duoshoutuan.com/user/homejin',
+    url: `${BBB_API}user/homejin`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(homejin,async(error, response, data) =>{
@@ -741,7 +747,7 @@ function homeJinCallBack() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let homejincallback ={
-      url: `https://bububao.duoshoutuan.com/you/callback`,
+      url: `${BBB_API}you/callback`,
       headers: JSON.parse(CookieVal[i]),
       body: `nonce_str=${homeJinStr}&tid=21&pos=1&`,
     }
@@ -764,7 +770,7 @@ function checkRedBagId() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let checkredbagid ={
-      url: `https://bububao.duoshoutuan.com/user/chuansj`,
+      url: `${BBB_API}user/chuansj`,
       headers: JSON.parse(CookieVal[i]),
       body: `c_type=2`,
     }
@@ -787,7 +793,7 @@ function redBagCallback() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let redbagcallback ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
+    url: `${BBB_API}you/callback`,
     headers: JSON.parse(CookieVal[i]),
     body: `nonce_str=${redBagStr}&tid=17&pos=1&`,
 }
@@ -811,7 +817,7 @@ function checkGoldEggId() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let checkgoldeggid ={
-    url: `https://bububao.duoshoutuan.com/user/jindan_click`,
+    url: `${BBB_API}user/jindan_click`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(checkgoldeggid,async(error, response, data) =>{
@@ -837,7 +843,7 @@ function goldEggDone() {
 return new Promise((resolve, reject) => {
   let timestamp= Date.parse(new Date())/1000;
   let goldeggdone ={
-    url: `https://bububao.duoshoutuan.com/user/jindan_done`,
+    url: `${BBB_API}user/jindan_done`,
     headers: JSON.parse(CookieVal[i]),
     body: `taskid=${goldEggId}&clicktime=${timestamp}&donetime=${timestamp}+1000&nonce_str=${goldEggStr}&`
 }
@@ -861,7 +867,7 @@ function goldEggCallback() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let goldeggcallback ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
+    url: `${BBB_API}you/callback`,
     headers: JSON.parse(CookieVal[i]),
     body: `nonce_str=${goldEggStr}&tid=5&pos=1&`,
 }
@@ -884,7 +890,7 @@ function helpStatus() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let helpstatus ={
-      url: `https://bububao.duoshoutuan.com/user/help_index`,
+      url: `${BBB_API}user/help_index`,
       headers: JSON.parse(CookieVal[i]),
     }
     $.post(helpstatus,async(error, response, data) =>{
@@ -906,7 +912,7 @@ function checkCode() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let checkcode ={
-      url: `https://bububao.duoshoutuan.com/user/chuansj`,
+      url: `${BBB_API}user/chuansj`,
       headers: JSON.parse(CookieVal[i]),
       body: `mini_pos=5`,
     }
@@ -928,7 +934,7 @@ function helpClick() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let helpclick ={
-      url: `https://bububao.duoshoutuan.com/user/help_click`,
+      url: `${BBB_API}user/help_click`,
       headers: JSON.parse(CookieVal[i]),
       body: `nonce_str=${nonce_str}`,
     }
@@ -953,7 +959,7 @@ function callBack() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let callback ={
-      url: `https://bububao.duoshoutuan.com/you/callback`,
+      url: `${BBB_API}you/callback`,
       headers: JSON.parse(CookieVal[i]),
       body: `nonce_str=${nonce_str}&tid=22&pos=1&`,
     }
@@ -977,7 +983,7 @@ function getNewsId() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let getnewsid ={
-    url: `https://bububao.duoshoutuan.com/user/news`,
+    url: `${BBB_API}user/news`,
     headers: JSON.parse(CookieVal[i]),
     body: `type_class=1`
 }
@@ -1010,7 +1016,7 @@ function autoRead() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let autoread ={
-      url: `https://bububao.duoshoutuan.com/user/donenews`,
+      url: `${BBB_API}user/donenews`,
       headers: JSON.parse(CookieVal[i]),
       body: `nonce_str=${newsStr}`,
     }
@@ -1030,7 +1036,7 @@ function checkLuckNum() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let lucknum ={
-    url: `https://bububao.duoshoutuan.com/user/lucky`,
+    url: `${BBB_API}user/lucky`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(lucknum,async(error, response, data) =>{
@@ -1060,7 +1066,7 @@ function luckyClick() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let luckclick ={
-    url: `https://bububao.duoshoutuan.com/user/lucky_click`,
+    url: `${BBB_API}user/lucky_click`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(luckclick,async(error, response, data) =>{
@@ -1087,7 +1093,7 @@ function luckyCallBack() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let luckycallback ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
+    url: `${BBB_API}you/callback`,
     headers: JSON.parse(CookieVal[i]),
     body: `nonce_str=${luckyStr}&tid=16&pos=1&`,
 }
@@ -1110,7 +1116,7 @@ function luckyBox() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let luckybox ={
-    url: `https://bububao.duoshoutuan.com/user/lucky_box`,
+    url: `${BBB_API}user/lucky_box`,
     headers: JSON.parse(CookieVal[i]),
     body: `box=${getBoxId()}&`,
 }
@@ -1136,7 +1142,7 @@ function luckyBoxCallBack() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let luckyboxcallback ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
+    url: `${BBB_API}you/callback`,
     headers: JSON.parse(CookieVal[i]),
     body: `nonce_str=${luckyBoxStr}&tid=16&pos=1&`,
 }
@@ -1160,7 +1166,7 @@ function getQuestionId() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let getquestionid ={
-    url: `https://bububao.duoshoutuan.com/mini/cy_info`,
+    url: `${BBB_API}mini/cy_info`,
     headers: JSON.parse(CookieVal[i]),
 }
    $.post(getquestionid,async(error, response, data) =>{
@@ -1190,7 +1196,7 @@ function checkSp() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let checksp ={
-    url: `https://bububao.duoshoutuan.com/user/chuansj`,
+    url: `${BBB_API}user/chuansj`,
     headers: JSON.parse(CookieVal[i]),
     body: `mini_pos=1&c_type=1&`,
 }
@@ -1211,7 +1217,7 @@ function cySp() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let cysp ={
-    url: `https://bububao.duoshoutuan.com/mini/cy_sp`,
+    url: `${BBB_API}mini/cy_sp`,
     headers: JSON.parse(CookieVal[i]),
     body: `day_num=${spId}&`,
 }
@@ -1231,7 +1237,7 @@ function answerQue() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let answerque ={
-    url: `https://bububao.duoshoutuan.com/mini/cy_click`,
+    url: `${BBB_API}mini/cy_click`,
     headers: JSON.parse(CookieVal[i]),
     body: `cy_id=${questionId}&site=${questionSite}&`,
 }
@@ -1258,7 +1264,7 @@ function answerQueCallBack() {
 return new Promise((resolve, reject) => {
   let timestamp=new Date().getTime();
   let answerquecallback ={
-    url: `https://bububao.duoshoutuan.com/you/callback`,
+    url: `${BBB_API}you/callback`,
     headers: JSON.parse(CookieVal[i]),
     body: `nonce_str=${answerStr}&tid=18&pos=1&`,
 }
@@ -1283,19 +1289,19 @@ function doneJin() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let donejin ={
-      url: 'https://bububao.duoshoutuan.com/user/donejin',
+      url: `${BBB_API}user/donejin`,
       headers: JSON.parse(CookieVal[i]),
     }
     $.post(donejin,async(error, response, data) =>{
       const donejb = JSON.parse(data)
       if(donejb.code == 1){
         $.log('\n🔔开始领取步数金币\n')
-        $.log('\n🎉步数金币:'+donejb.msg+'\n金币+ '+donejb.jinbi+'等待30s后开始翻倍金币\n')
+        $.log('\n🎉步数金币:'+donejb.msg+'\n金币+ '+donejb.jinbi+'，等待30s后开始翻倍金币\n')
         doneJinStr = donejb.nonce_str
         await $.wait(30000)
         await doneJinCallBack()
       }else{
-        $.log('\n⚠️步数金币失败:'+donejb.msg+'\n')
+        $.log('\n⚠️步数金币失败：'+donejb.msg+'\n')
       }
       resolve()
     })
@@ -1308,7 +1314,7 @@ function doneJinCallBack() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let donejincallback ={
-      url: `https://bububao.duoshoutuan.com/you/callback`,
+      url: `${BBB_API}you/callback`,
       headers: JSON.parse(CookieVal[i]),
       body: `nonce_str=${doneJinStr}&tid=19&pos=1&`,
     }
@@ -1319,7 +1325,7 @@ function doneJinCallBack() {
         $.log('\n🎉步数金币翻倍成功\n')
         await checkHomeJin()
       }else{
-        $.log('\n🔔步数金币翻倍失败'+bsjcallback.msg+'\n')
+        $.log('\n🔔步数金币翻倍失败：'+bsjcallback.msg+'\n')
       }
       resolve()
     })
@@ -1331,7 +1337,7 @@ function doneJinS() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let donejins ={
-      url: 'https://bububao.duoshoutuan.com/user/donejin',
+      url: `${BBB_API}user/donejin`,
       headers: JSON.parse(CookieVal[i]),
     }
     $.post(donejins,async(error, response, data) =>{
@@ -1352,7 +1358,7 @@ function checkH5Id() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let checkh5id ={
-      url: `https://bububao.duoshoutuan.com/user/h5_list?page=1&page_limit=15`,
+      url: `${BBB_API}user/h5_list?page=1&page_limit=15`,
       headers: JSON.parse(CookieVal[i]),
     }
     $.post(checkh5id,async(error, response, data) =>{
@@ -1374,7 +1380,7 @@ function doTaskH5() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let dotaskh5 ={
-      url: `https://bububao.duoshoutuan.com/user/h5_news`,
+      url: `${BBB_API}user/h5_news`,
       headers: JSON.parse(CookieVal[i]),
       body: `mini_id=${H5ID}`,
     }
@@ -1436,7 +1442,7 @@ function h5Done() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let h5done ={
-      url: `https://bububao.duoshoutuan.com/user/h5_newsdone`,
+      url: `${BBB_API}user/h5_newsdone`,
       headers: JSON.parse(CookieVal[i]),
       body: `nonce_str=${H5Str}&taskid=${H5TaskID}`,
       timeout: 31000,
@@ -1444,7 +1450,7 @@ function h5Done() {
     $.post(h5done,async(error, response, data) =>{
       const doneh5 = JSON.parse(data)
       if(doneh5.code == 1) {
-        $.log('\n看看賺成功, 金币+ '+doneh5.jinbi+'31秒后翻倍金币\n')
+        $.log('\n看看賺成功, 金币+ '+doneh5.jinbi+'，31秒后翻倍金币\n')
         h5DoneStr = doneh5.fb_str
         await $.wait(31000)
         await h5DoneCallBack()
@@ -1461,7 +1467,7 @@ function h5DoneCallBack() {
   return new Promise((resolve, reject) => {
     let timestamp=new Date().getTime();
     let donejincallback ={
-      url: `https://bububao.duoshoutuan.com/you/callback`,
+      url: `${BBB_API}you/callback`,
       headers: JSON.parse(CookieVal[i]),
       body: `nonce_str=${h5DoneStr}&tid=19&pos=1&`,
     }
@@ -1478,5 +1484,7 @@ function h5DoneCallBack() {
     })
   })
 }
+
+
 
 function Env(t,e){class s{constructor(t){this.env=t}send(t,e="GET"){t="string"==typeof t?{url:t}:t;let s=this.get;return"POST"===e&&(s=this.post),new Promise((e,i)=>{s.call(this,t,(t,s,r)=>{t?i(t):e(s)})})}get(t){return this.send.call(this.env,t)}post(t){return this.send.call(this.env,t,"POST")}}return new class{constructor(t,e){this.name=t,this.http=new s(this),this.data=null,this.dataFile="box.dat",this.logs=[],this.isMute=!1,this.isNeedRewrite=!1,this.logSeparator="\n",this.startTime=(new Date).getTime(),Object.assign(this,e),this.log("",`\ud83d\udd14${this.name}, \u5f00\u59cb!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient&&"undefined"==typeof $loon}isLoon(){return"undefined"!=typeof $loon}toObj(t,e=null){try{return JSON.parse(t)}catch{return e}}toStr(t,e=null){try{return JSON.stringify(t)}catch{return e}}getjson(t,e){let s=e;const i=this.getdata(t);if(i)try{s=JSON.parse(this.getdata(t))}catch{}return s}setjson(t,e){try{return this.setdata(JSON.stringify(t),e)}catch{return!1}}getScript(t){return new Promise(e=>{this.get({url:t},(t,s,i)=>e(i))})}runScript(t,e){return new Promise(s=>{let i=this.getdata("@chavy_boxjs_userCfgs.httpapi");i=i?i.replace(/\n/g,"").trim():i;let r=this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");r=r?1*r:20,r=e&&e.timeout?e.timeout:r;const[o,h]=i.split("@"),a={url:`http://${h}/v1/scripting/evaluate`,body:{script_text:t,mock_type:"cron",timeout:r},headers:{"X-Key":o,Accept:"*/*"}};this.post(a,(t,e,i)=>s(i))}).catch(t=>this.logErr(t))}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e);if(!s&&!i)return{};{const i=s?t:e;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e),r=JSON.stringify(this.data);s?this.fs.writeFileSync(t,r):i?this.fs.writeFileSync(e,r):this.fs.writeFileSync(t,r)}}lodash_get(t,e,s){const i=e.replace(/\[(\d+)\]/g,".$1").split(".");let r=t;for(const t of i)if(r=Object(r)[t],void 0===r)return s;return r}lodash_set(t,e,s){return Object(t)!==t?t:(Array.isArray(e)||(e=e.toString().match(/[^.[\]]+/g)||[]),e.slice(0,-1).reduce((t,s,i)=>Object(t[s])===t[s]?t[s]:t[s]=Math.abs(e[i+1])>>0==+e[i+1]?[]:{},t)[e[e.length-1]]=s,t)}getdata(t){let e=this.getval(t);if(/^@/.test(t)){const[,s,i]=/^@(.*?)\.(.*?)$/.exec(t),r=s?this.getval(s):"";if(r)try{const t=JSON.parse(r);e=t?this.lodash_get(t,i,""):e}catch(t){e=""}}return e}setdata(t,e){let s=!1;if(/^@/.test(e)){const[,i,r]=/^@(.*?)\.(.*?)$/.exec(e),o=this.getval(i),h=i?"null"===o?null:o||"{}":"{}";try{const e=JSON.parse(h);this.lodash_set(e,r,t),s=this.setval(JSON.stringify(e),i)}catch(e){const o={};this.lodash_set(o,r,t),s=this.setval(JSON.stringify(o),i)}}else s=this.setval(t,e);return s}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,e){return this.isSurge()||this.isLoon()?$persistentStore.write(t,e):this.isQuanX()?$prefs.setValueForKey(t,e):this.isNode()?(this.data=this.loaddata(),this.data[e]=t,this.writedata(),!0):this.data&&this.data[e]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,e=(()=>{})){t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon()?(this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient.get(t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status),e(t,s,i)})):this.isQuanX()?(this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t))):this.isNode()&&(this.initGotEnv(t),this.got(t).on("redirect",(t,e)=>{try{if(t.headers["set-cookie"]){const s=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();this.ckjar.setCookieSync(s,null),e.cookieJar=this.ckjar}}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>{const{message:s,response:i}=t;e(s,i,i&&i.body)}))}post(t,e=(()=>{})){if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),t.headers&&delete t.headers["Content-Length"],this.isSurge()||this.isLoon())this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient.post(t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status),e(t,s,i)});else if(this.isQuanX())t.method="POST",this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t));else if(this.isNode()){this.initGotEnv(t);const{url:s,...i}=t;this.got.post(s,i).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>{const{message:s,response:i}=t;e(s,i,i&&i.body)})}}time(t){let e={"M+":(new Date).getMonth()+1,"d+":(new Date).getDate(),"H+":(new Date).getHours(),"m+":(new Date).getMinutes(),"s+":(new Date).getSeconds(),"q+":Math.floor(((new Date).getMonth()+3)/3),S:(new Date).getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,((new Date).getFullYear()+"").substr(4-RegExp.$1.length)));for(let s in e)new RegExp("("+s+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?e[s]:("00"+e[s]).substr((""+e[s]).length)));return t}msg(e=t,s="",i="",r){const o=t=>{if(!t)return t;if("string"==typeof t)return this.isLoon()?t:this.isQuanX()?{"open-url":t}:this.isSurge()?{url:t}:void 0;if("object"==typeof t){if(this.isLoon()){let e=t.openUrl||t.url||t["open-url"],s=t.mediaUrl||t["media-url"];return{openUrl:e,mediaUrl:s}}if(this.isQuanX()){let e=t["open-url"]||t.url||t.openUrl,s=t["media-url"]||t.mediaUrl;return{"open-url":e,"media-url":s}}if(this.isSurge()){let e=t.url||t.openUrl||t["open-url"];return{url:e}}}};this.isMute||(this.isSurge()||this.isLoon()?$notification.post(e,s,i,o(r)):this.isQuanX()&&$notify(e,s,i,o(r)));let h=["","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];h.push(e),s&&h.push(s),i&&h.push(i),console.log(h.join("\n")),this.logs=this.logs.concat(h)}log(...t){t.length>0&&(this.logs=[...this.logs,...t]),console.log(t.join(this.logSeparator))}logErr(t,e){const s=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();s?this.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.stack):this.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t)}wait(t){return new Promise(e=>setTimeout(e,t))}done(t={}){const e=(new Date).getTime(),s=(e-this.startTime)/1e3;this.log("",`\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${s} \u79d2`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,e)}
