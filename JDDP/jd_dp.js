@@ -1,40 +1,21 @@
 /*
 店铺签到，各类店铺签到，有新的店铺直接添加token即可
-更新地址：https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js
-已支持IOS双京东账号, Node.js支持N个京东账号
-脚本兼容: QuantumultX, Surge, Loon, 小火箭，JSBox, Node.js
-============Quantumultx===============
-[task_local]
-#店铺签到
-20 7 * * * https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js, tag=店铺签到, enabled=true
-
-================Loon==============
-[Script]
-cron "20 7 * * *" script-path=https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js, tag=店铺签到
-
-===============Surge=================
-店铺签到 = type=cron,cronexp="10 7 * * *",wake-system=1,timeout=20,script-path=https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js
-
-============小火箭=========
-店铺签到 = type=cron,script-path=https://raw.githubusercontent.com/mit-ywtm/MyJD/main/JDDP/jd_dp.js, cronexpr="20 * * *", timeout=200, enable=true
- */
+*/
 const $ = new Env('店铺签到');
 const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-const user_agent=require('./Useragent.js');
 const JD_API_HOST = 'https://api.m.jd.com/api?appid=interCenter_shopSign';
 let activityId=''
+var notice =''
 let vender=''
 let num=0
 
 const token=[
-  '1676F536588C52D3AD145F80DC8C6FD2',
+  '3E12B6185BB6DDB9A876340CB0ECBF89',
   'FEC0244D748F99A452C9E37B8944D2D3',
-  'A6492C79085ADE8BFA760FC0B0CACB66',
-  'DF30084EB3E850B72B8446EF959DDC80',
+  'ADF4DEFD75018C095A87C6DFE8D93262',
+  '73E495F79889862EDBADCF57FE4F6378',
   '5634899A50F1B03388CA8988DFC882B3',
-  '3F3041AA03AA1403B6326C2923EB9385',
-  '1260C6BF7F53AAB348AC18D176BF612B',
 ]
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '';
@@ -94,6 +75,7 @@ async function dpqd(){
     await signCollectGift(token[j],vender,activityId)
     await taskUrl(token[j],vender)
   }
+  await showMsg()
 }
 function getvenderId(token) {
   return new Promise(resolve => {
@@ -119,6 +101,7 @@ function getvenderId(token) {
           if (data.code==402) {
             vender=''
             console.log(`第`+num+`个店铺签到活动已失效`)
+            notice +=`第`+num+`个店铺签到活动已失效\n`
           }else{
             vender=data.data.venderId
           }
@@ -215,8 +198,10 @@ function taskUrl(token,venderId) {
           console.log(`\n${$.name}: API查询请求失败 ‼️‼️`)
           $.logErr(err);
         } else {
+            // console.log(data)
             data = JSON.parse(/{(.*)}/g.exec(data)[0])
             console.log(`第`+num+`个店铺已签到：`+data.data.days+`天`)
+            notice +=`第`+num+`个店铺已签到：`+data.data.days+`天\n`
         }
       } catch (e) {
         $.logErr(e, resp);
@@ -226,6 +211,14 @@ function taskUrl(token,venderId) {
     })
   })
 }
+
+async function showMsg() {
+  if ($.isNode()) {
+    await notify.sendNotify(`${$.name} - 账号${$.index}`, notice);
+    notice =''
+  }
+}
+
 
 function TotalBean() {
   return new Promise(async resolve => {
@@ -239,7 +232,7 @@ function TotalBean() {
         "Connection": "keep-alive",
         "Cookie": cookie,
         "Referer": "https://wqs.jd.com/my/jingdou/my.shtml?sceneval=2",
-        "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.2.2;14.2;%E4%BA%AC%E4%B8%9C/9.2.2 CFNetwork/1206 Darwin/20.1.0")
+        "User-Agent": `jdapp;android;9.3.5;10;3353234393134326-3673735303632613;network/wifi;model/MI 8;addressid/138719729;aid/3524914bc77506b1;oaid/274aeb3d01b03a22;osVer/29;appBuild/86390;psn/Mp0dlaZf4czQtfPNMEfpcYU9S/f2Vv4y|2255;psq/1;adk/;ads/;pap/JA2015_311210|9.3.5|ANDROID 10;osv/10;pv/2039.1;jdv/0|androidapp|t_335139774|appshare|QQfriends|1611211482018|1611211495;ref/com.jingdong.app.mall.home.JDHomeFragment;partner/jingdong;apprpd/Home_Main;eufv/1;jdSupportDarkMode/0;Mozilla/5.0 (Linux; Android 10; MI 8 Build/QKQ1.190828.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045230 Mobile Safari/537.36`
       }
     }
     $.post(options, (err, resp, data) => {
