@@ -29,11 +29,7 @@ let livedetail={
   "liveId":"3488734",
   "url":"https://api.m.jd.com/client.action?functionId=liveActivityV842&clientVersion=9.3.6&build=86560&client=android&d_brand=Xiaomi&d_model=MI8&osVersion=10&screen=2115*1080&partner=xiaomi001&aid=3524914bc77506b1&oaid=274aeb3d01b03a22&openudid=3524914bc77506b1&eid=eidAef9a8121f9s8dlmkPL9TRL6I3dSjuDRbDHZZparHzRuMJ+ojIXbMperpUF0QK+gPsjBjXLYUU9FtgHGBv7+bZHeUkYnKC9eXT1Hf5cp2ILYAY+tl&sdkVersion=29&lang=zh_CN&uuid=3524914bc77506b1&area=17_1432_45217_45228&networkType=wifi&wifiBssid=9eeb19d7e4f849defc20e26fee6083e7&uts=0f31TVRjBSuhwYLyvify4e6X%2BpqH6zgzBNJJ3foo651FSIN3Co8ckzzenB0f4QuF2iC7WtIfB2tQBmwBlSfgFaiNKDpDA26ksMwBL3aIIu%2B0p%2BQY7TB7G0t%2BliJ52%2F6y7cNRF90XBty%2FVMS50k6CK6OCNilTsmiWkhcpNare%2BBawE4pm5seNbpVI5HjbvlTvygIbByyJMRWlCj65lw%2FFyA%3D%3D&st=1612779563617&sign=667b8d5f1a70b9f2805ffd7b7f6d1896&sv=112",
 }
-let ids = {
-  '19': 'RRA3S6TRRbnNNuGN43oHMA5okbcXmRY',
-  '20': 'RRAtnUabh1CppfNkddJCfp8rMuRLiL',
-  '21': 'RRA85AvVYJBvkmwpDhn4Y9cMRXV9mH',
-}
+
 console.log(`直播间ID：`+livedetail.liveId)
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
@@ -62,14 +58,8 @@ const JD_API_HOST = 'https://api.m.jd.com/api';
   let hour = (new Date().getUTCHours() + 8) %24
   console.log(`\n现在整点时间：`+hour)
   if(!$.activityId){
-      $.log(`远程红包雨配置获取错误，从本地读取配置`)
-      if (ids[hour]){
-        $.activityId = ids[hour]
-        $.log(`本地红包雨配置获取成功`)
-      } else{
-        $.log(`无法从本地读取配置，请检查运行时间`)
-        return
-      }
+      $.log(`在线红包雨配置获取错误，使用内置activityId`)
+      $.activityId=`RRA3S6TRRbnNNuGN43oHMA5okbcXmRY`
   }else{
       $.log(`在线红包雨配置获取成功\n`)
       $.log(`在线红包雨配置获取成功，红包雨id：${$.activityId}\n`)
